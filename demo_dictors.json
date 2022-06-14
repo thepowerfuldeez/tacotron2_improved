@@ -1,0 +1,9 @@
+{
+  "mike_location": {
+    "checkpoint_dir": "/home/frappuccino/tts_checkpoints/mike/v1_location/",
+    "multispeaker": false, "n_speakers": 1, "sampling_rate": 22050,
+    "cleaners": ["flowtron_cleaners"],
+    "speed_control": false,
+    "message": "MODEL_NAME=\"snoop\" CONFIG=configs/config_snoop.yaml MESSAGE=\"snoop\" OUT_PATH=/storage/george/tts_checkpoints/snoop_lj_11k/v14/ RUN_ID=\"ssspseudo23339n\" ./train.sh"
+  }
+}
