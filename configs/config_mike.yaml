@@ -15,7 +15,7 @@ experiment:
   cudnn_benchmark: False
 
 training:
-  epochs: 850
+  epochs: 700
   batch_size: 48
   # expected for 3 gpus, for 1 gpu divide by 2, for 3 gpus multiply by 1.5
   # learning rate is ramping from 0 and decaying using cosine by default
