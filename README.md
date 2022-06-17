@@ -18,6 +18,7 @@ In this version of tacotron2 many new tweaks are added.
 ```bash
 MODEL_NAME="mike" CONFIG=configs/config_mike.yaml MESSAGE="mike forward" OUT_PATH=/home/frappuccino/tts_checkpoints/mike/v2_forward/ RUN_ID="150622_01f" ./train.sh
 ```
+check script before running! it sets as training from scratch on ljspeech by default! maybe you would need to fine-tune from pre-train
 after training, script would make bert vectors & train tpse and also trace model with embedded scale stats
 
 
@@ -67,6 +68,7 @@ Fre-GAN is an improvement over HifiGAN achieving same level of quality with 5x l
    ```
    it will create mels_gen/ folder close to mels/ in dataset folder
 4. change paths to new filelists/ in `config.json` and run training with new `--input_mels_dir` provided and `--fine_tuning` flag
+Make sure though you specified new checkpoint path but you have put latest generator and discriminator from pre-train
 5. trace checkpoint to final model folder to demo with `python trace.py -c CHECKPOINT_PATH --out_path $OUT_PATH/generator.pth`
 
 

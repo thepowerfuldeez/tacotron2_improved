@@ -95,9 +95,9 @@ def _should_keep_symbol(s):
 
 def _clean_word_before_phones(word):
     # start of the string AND all the punctuation
-    re_start_punc = r"\A\W+"
+    re_start_punc = r"^\W+"
     # all the punctuation till the end of the string
-    re_end_punc = r"(\W*<pzero>|\W*<pone>|\W*<ptwo>)+\Z"
+    re_end_punc = r"(\W+|\W*<pzero>|\W*<pone>|\W*<ptwo>)$"
 
     start_symbols = re.findall(re_start_punc, word)
     if len(start_symbols):

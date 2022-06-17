@@ -134,14 +134,14 @@ model:
   use_zoneout: False
 
   # 'location' or 'forward'
-  attention_type: 'forward'
+  attention_type: 'location'
   attention_rnn_dim: 1024
   attention_dim: 128
   # Location Layer parameters
   attention_location_n_filters: 32
   attention_location_kernel_size: 31
   # Windowing Attention Parameters (only at inference)
-  windowing_attention: False
+  windowing_attention: True
   win_attention_back: 15
   win_attention_front: 25
   pre_alignment: False

@@ -1,6 +1,6 @@
 {
   "mike_location": {
-    "checkpoint_dir": "/home/frappuccino/tts_checkpoints/mike/v1_location/",
+    "checkpoint_dir": "/home/frappuccino/tts_checkpoints/mike/v11_location/",
     "sampling_rate": 22050, "cleaners": ["flowtron_cleaners"],
     "speed_control": false,
     "message": "MODEL_NAME=\"snoop\" CONFIG=configs/config_snoop.yaml MESSAGE=\"snoop\" OUT_PATH=/storage/george/tts_checkpoints/snoop_lj_11k/v14/ RUN_ID=\"ssspseudo23339n\" ./train.sh"
@@ -11,10 +11,10 @@
     "speed_control": true,
     "message": "MODEL_NAME=\"snoop\" CONFIG=configs/config_snoop.yaml MESSAGE=\"snoop\" OUT_PATH=/storage/george/tts_checkpoints/snoop_lj_11k/v14/ RUN_ID=\"ssspseudo23339n\" ./train.sh"
   },
-  "mike_forward_hifigan": {
-    "checkpoint_dir": "/home/frappuccino/tts_checkpoints/mike/v2_forward/",
+  "mike_location_hifigan": {
+    "checkpoint_dir": "/home/frappuccino/tts_checkpoints/mike/v2_location/",
     "sampling_rate": 22050, "cleaners": ["flowtron_cleaners"],
-    "speed_control": true,
+    "speed_control": false,
     "message": "MODEL_NAME=\"mike\" CONFIG=configs/config_mike.yaml MESSAGE=\"mike hifigan\" OUT_PATH=/home/frappuccino/tts_checkpoints/mike/v2_forward/ RUN_ID=\"150622_01f\" ./train.sh"
   },
   "mike_forward_fregan": {

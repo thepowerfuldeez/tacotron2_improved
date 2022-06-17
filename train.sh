@@ -6,11 +6,12 @@ PYTHONPATH=. python scripts/compute_statistics.py --config "$CONFIG"
 # make new config which points to /storage/frappuccino/data/filelists/mike_pauses/
 mkdir -p "$OUT_PATH"
 export CHECKPOINT_DIR="/home/frappuccino/outdir/${MODEL_NAME}_${RUN_ID}/"
+
 # it will take 6 hours for 12k iterations on one gpu
 CUDA_VISIBLE_DEVICES=0,1 python -m multiproc train.py --n_gpus 2 --config "$CONFIG" -o /home/frappuccino/outdir/ -m "$MESSAGE" --run_id "$RUN_ID"
 
-# if needed to continue training
-#CUDA_VISIBLE_DEVICES=0,1 python -m multiproc train.py --n_gpus 2 --config "$CONFIG" -o /storage/frappuccino/outdir/ -m "$MESSAGE" --run_id "$RUN_ID" -c /storage/frappuccino/outdir/ljspeech_11k_3232lj43/checkpoint_ljspeech_11k_last.pt --warm_start
+# if needed to continue training or fine-tuning
+#CUDA_VISIBLE_DEVICES=0,1 python -m multiproc train.py --n_gpus 2 --config "$CONFIG" -o /home/frappuccino/outdir/ -m "$MESSAGE" --run_id "$RUN_ID" -c /home/frappuccino/outdir/ljspeech_lj_160622_02l/checkpoint_ljspeech_last.pt --warm_start
 
 # usually you can copy traced vocoder from other model if you do this not first time
 #cp /storage/frappuccino/tts_checkpoints/snoop_lj_11k/v11/generator.pth "$OUT_PATH"
