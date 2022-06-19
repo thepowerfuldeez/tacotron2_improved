@@ -157,7 +157,7 @@ model:
   # GST params                   #
   ################################
   use_gst: True
-  gst_fusion_type: 'sum'
+  gst_fusion_type: 'sum'  # 'sum' or 'concat'
   # if fusion_type is sum, you must set embedding dim the same as encoder_out * 2
   gst_embedding_dim: 1024
   gst_reference_encoder_dim: 128

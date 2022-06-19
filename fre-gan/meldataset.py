@@ -112,17 +112,6 @@ class MelDataset(torch.utils.data.Dataset):
         self.fine_tuning = fine_tuning
         self.base_mels_path = base_mels_path
 
-        # audio_files = []
-        # print('before', len(self.audio_files))
-        # for i, f in tqdm(list(enumerate(self.audio_files))):
-        #     try:
-        #         if self.__getitem__(i):
-        #             audio_files.append(f)
-        #     except:
-        #         continue
-        # self.audio_files = audio_files
-        # print('after', len(self.audio_files))
-
     def __getitem__(self, index):
         filename = self.audio_files[index]
         if self._cache_ref_count == 0:

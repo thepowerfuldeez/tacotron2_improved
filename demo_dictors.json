@@ -17,10 +17,10 @@
     "speed_control": false,
     "message": "MODEL_NAME=\"mike\" CONFIG=configs/config_mike.yaml MESSAGE=\"mike hifigan\" OUT_PATH=/home/frappuccino/tts_checkpoints/mike/v2_forward/ RUN_ID=\"150622_01f\" ./train.sh"
   },
-  "mike_forward_fregan": {
-    "checkpoint_dir": "/home/frappuccino/tts_checkpoints/mike/v1_forward_fregan/",
+  "mike_2_location": {
+    "checkpoint_dir": "/home/frappuccino/tts_checkpoints/mike/v3_location/",
     "sampling_rate": 22050, "cleaners": ["flowtron_cleaners"],
-    "speed_control": true,
+    "speed_control": false,
     "message": "MODEL_NAME=\"mike\" CONFIG=configs/config_mike.yaml MESSAGE=\"mike hifigan\" OUT_PATH=/home/frappuccino/tts_checkpoints/mike/v2_forward/ RUN_ID=\"150622_01f\" ./train.sh"
   }
 }

@@ -14,18 +14,6 @@ from text import text_to_sequence, cmudict, _clean_text, get_arpabet
 from utils.utils import load_wav, load_filepaths_and_text, StandardScaler
 
 
-def beta_binomial_prior_distribution(phoneme_count, mel_count):
-    P, M = phoneme_count, mel_count
-    x = np.arange(0, P)
-    mel_text_probs = []
-    for i in range(1, M + 1):
-        a, b = i, M + 1 - i
-        rv = betabinom(P, a, b)
-        mel_i_prob = rv.pmf(x)
-        mel_text_probs.append(mel_i_prob)
-    return torch.tensor(np.array(mel_text_probs))
-
-
 class TextMelLoader(torch.utils.data.Dataset):
     """
         1) loads audio,text pairs
@@ -48,16 +36,6 @@ class TextMelLoader(torch.utils.data.Dataset):
         self.cmudict = cmudict.CMUDict(hparams.data.cmudict_path, keep_ambiguous=False)
         self.skip_heteronyms = hparams.data.skip_heteronyms
         self.p_arpabet = hparams.data.p_arpabet
-
-        self.pre_alignment = hparams.model.pre_alignment
-        if self.pre_alignment:
-            if not hasattr(hparams.data, "path_to_alignments"):
-                parent_folder = Path(self.audiopaths_and_text[0][0]).parent.parent
-                hparams.data.path_to_alignments = parent_folder / "pre_alignments"
-                print(f"pre_alignment set to True but hparams.data.path_to_alignments is not set, "
-                      f"defaulting to {hparams.data.path_to_alignments}")
-            self.alignments_path = Path(hparams.data.path_to_alignments)
-            self.p_arpabet = 1.0
 
         self.setup_scaler(hparams.data.stats_path)
         # should be about the batch size
@@ -150,19 +128,11 @@ class TextMelLoader(torch.utils.data.Dataset):
         mel = self.get_mel(audiopath)
         mel = self.normalize(mel)
 
-        attention_prior = None
-        if self.pre_alignment:
-            attention_prior = self.get_alignments(audiopath)
-            m, t = attention_prior.shape
-            if m != mel.size(1) or t != len(text):
-                print(f"{attention_prior.shape=}, {mel.size(1)=}, {len(text)=} {audiopath=}")
-
         item = {
             "text": text,
             "mel": mel,
             "speaker": torch.tensor(speaker),
             "audiopath": audiopath,
-            "attention_prior": attention_prior,
             "cleaned_text": cleaned_text,
         }
         return item
@@ -216,10 +186,6 @@ class TextMelLoader(torch.utils.data.Dataset):
             return text_norm, cleaned_text
         return text_norm
 
-    def get_alignments(self, path):
-        path = f"{self.alignments_path}/{Path(path).stem}.npy"
-        return torch.tensor(np.load(path)).T
-
     def __getitem__(self, index):
         return self.get_data(self.audiopaths_and_text[index])
 
@@ -262,15 +228,6 @@ class TextMelCollate:
             max_target_len += (self.n_frames_per_step - (max_target_len % self.n_frames_per_step))
             assert max_target_len % self.n_frames_per_step == 0
 
-        # Right zero-pad pre-alignment
-        attn_prior_padded = torch.FloatTensor(len(batch), max_target_len, max_input_len)
-        attn_prior_padded.zero_()
-
-        if batch[0]['attention_prior'] is not None:
-            for i in range(len(ids_sorted_decreasing)):
-                align = batch[ids_sorted_decreasing[i]]['attention_prior']
-                attn_prior_padded[i, :align.size(0), :align.size(1)] = align[:, :align.size(1)]
-
         # include mel padded and gate padded
         mel_padded = torch.FloatTensor(len(batch), num_mels, max_target_len)
         mel_padded.zero_()
@@ -291,8 +248,8 @@ class TextMelCollate:
             "mel_padded": mel_padded,
             "gate_padded": gate_padded,
             "output_lengths": output_lengths,
-            "speaker": torch.stack([batch[ids_sorted_decreasing[i]]['speaker'] for i in range(len(ids_sorted_decreasing))]),
-            "attn_prior_padded": attn_prior_padded,
+            "speaker": torch.stack(
+                [batch[ids_sorted_decreasing[i]]['speaker'] for i in range(len(ids_sorted_decreasing))]),
             "cleaned_texts": cleaned_texts
         }
         if self.inference:

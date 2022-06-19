@@ -50,8 +50,6 @@ def parse_batch(batch):
     batch['mel_padded'] = to_gpu(batch['mel_padded']).float()
     batch['gate_padded'] = to_gpu(batch['gate_padded']).float()
     batch['output_lengths'] = to_gpu(batch['output_lengths']).long()
-    if torch.is_tensor(batch['attn_prior_padded']):
-        batch['attn_prior_padded'] = to_gpu(batch['attn_prior_padded']).float()
 
     return batch
 

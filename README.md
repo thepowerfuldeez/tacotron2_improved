@@ -9,7 +9,7 @@ In this version of tacotron2 many new tweaks are added.
 - Batching strategy to minimize padding
 - Guided diagonal attention loss
 - New forward attention
-- Ability for pauses in text
+- Ability to add pauses in text
 - GST vectors and TPSE from BERT for inference
 - Traceability for easy deployment including TPSE module
 

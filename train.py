@@ -341,11 +341,6 @@ def set_seeds(hparams, n_gpus, rank, group_name):
 
 
 def init_data(hparams, inference=False):
-    if not hasattr(hparams, "pre_alignment"):
-        print("hparams.model.pre_alignment if not set, setting to False")
-        hparams.model.pre_alignment = False
-    if hparams.model.pre_alignment and hparams.data.text_cleaners != ['english_cleaners']:
-        raise RuntimeError("hparams.model.pre_alignment if set to True, but text cleaners are not 'english_cleaners' !")
     train_loader, valset, collate_fn = prepare_dataloaders(hparams, inference=inference)
     return train_loader, valset, collate_fn
 
