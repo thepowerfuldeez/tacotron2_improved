@@ -1,0 +1,170 @@
+# LJSpeech config with L2 reg, zoneout, prenet noise
+################################
+# Experiment Parameters        #
+################################
+experiment:
+  name: "mike"  # name of experiment
+  log_every: 10
+  iters_per_checkpoint: 500
+  seed: 1234
+  fp16_run: False
+  distributed_run: True
+  dist_backend: "nccl"
+  dist_url: "tcp://localhost:54321"
+  cudnn_enabled: True
+  cudnn_benchmark: False
+
+training:
+  epochs: 1200
+  batch_size: 64
+  # expected for 3 gpus, for 1 gpu divide by 2, for 3 gpus multiply by 1.5
+  # learning rate is ramping from 0 and decaying using cosine by default
+  learning_rate: 0.0004
+  disable_lr_decay: False
+  mask_padding: True  # set model's padded outputs to padded values
+
+  # Loss params
+  loss_use_masking: True
+  loss_bce_pos_weight: 5.0
+  loss_guided_attn_weight: 0.1
+  loss_guided_attn_weight_decay: 0.999
+  loss_guided_attn_min_value: 0.0000001
+
+  ################################
+  # Optimization Hyperparameters #
+  ################################
+  use_saved_learning_rate: False
+  # divide n_epochs by X parts. First 2 decay from lr to lr/10, third from lr/10 to lr/1e2, last from lr/1e2 to 0
+  n_warmup_steps: 1000
+  weight_decay: 0.000009
+  grad_clip_thresh: 1.5
+
+################################
+# Data Parameters             #
+################################
+data:
+  load_mel_from_disk: True
+  training_files: '/home/frappuccino/data/filelists/mike_pauses/train.txt'
+  validation_files: '/home/frappuccino/data/filelists/mike_pauses/val.txt'
+  text_cleaners: ['english_cleaners']
+  cmudict_path: "data/cmudict_dictionary"
+  skip_heteronyms: False
+  batch_group_size: 0.05
+  # probability of word converted to phonemes
+  p_arpabet: 0.99
+
+  ################################
+  # Audio Parameters             #
+  ################################
+  sampling_rate: 22050
+  mel_fmin: 20.0
+  mel_fmax: 11025.0
+  n_mel_channels: 80
+  max_wav_value: 32768.0
+  filter_length: 1024
+  win_length: 1024
+  hop_length: 256
+
+  # Normalization parameters
+  # DO NOT USE WITH MULTI_SPEAKER MODEL. scaler stats file computed by 'compute_statistics.py'.
+  # If it is defined mean-std based notmalization is used and other normalization params are ignored
+  stats_path: "/home/frappuccino/data/filelists/mike_pauses/scale_stats.npy"
+
+checkpoint:
+  start_from_iteration: -1  # -1 to resume from checkpoint, else from such iteration
+
+  # use ignore layers when --warm_start is applied.
+  # Empty list is also supported, in that case any new keys in model, but not in checkpoint
+  # will also be loaded
+  # set to speaker_embedding.weight when doing speaker adaptation
+  ignore_layers: [
+    "encoder.embedding.weight",
+    "decoder.linear_projection.*",
+    "decoder.gate_layer.linear_layer.weight",
+    "gst.style_token_layer.*"
+
+#    "decoder.attention_rnn.weight_ih",
+#    "decoder.attention.memory_layer.linear_layer.weight",
+  ]
+  # for speaker adaptation
+  train_only_layers: [
+    # 'speaker_embedding.weight'
+    # 'embedding.weight'
+    #"gst.*"
+
+    # retrain gate_layer
+  #  "decoder.gate_layer.linear_layer.weight",
+  #  "decoder.gate_layer.linear_layer.bias",
+  ]
+
+################################
+# Model Parameters             #
+################################
+model:
+  n_symbols: 153  #len(symbols)
+
+  # Encoder parameters
+  encoder_kernel_size: 5
+  encoder_n_convolutions: 3
+  encoder_embedding_dim: 512
+  # encoder out size, will be doubled as we use bidirectional lstm
+  encoder_lstm_hidden_dim: 512
+
+  ################################
+  # Decoder parameters           #
+  ################################
+  n_frames_per_step: 2
+  max_decoder_steps: 1500
+  gate_threshold: 0.4
+  decoder_rnn_dim: 1024
+  prenet_dim: 256
+  prenet_noise: 0.02
+
+  p_teacher_forcing: 0.985
+  # quite strong augmentation, check number of iterations in advance to set this properly
+  p_teacher_forcing_decay_rate: 0.999999
+
+  ################################
+  # Attention parameters         #
+  ################################
+  # start from 0.2 and decrease to 0.1 at the end of training ( when attention converged )
+  p_attention_dropout: 0.12
+  p_decoder_dropout: 0.12
+  # increases memory consumption, pretty strong augmentation
+  use_zoneout: False
+
+  # 'location' or 'forward'
+  attention_type: 'location'
+  attention_rnn_dim: 1024
+  attention_dim: 128
+  # Location Layer parameters
+  attention_location_n_filters: 32
+  attention_location_kernel_size: 31
+  # Windowing Attention Parameters (only at inference)
+  windowing_attention: False
+  win_attention_back: 15
+  win_attention_front: 25
+  pre_alignment: False
+
+  # Mel-post processing network parameters
+  postnet_embedding_dim: 512
+  postnet_kernel_size: 5
+  postnet_n_convolutions: 5
+  # sometimes fixes problems with exploding gradients
+  postnet_bn_disable_running_stats: False
+
+  ################################
+  # GST params                   #
+  ################################
+  use_gst: True
+  gst_fusion_type: 'sum'  # 'sum' or 'concat'
+  # if fusion_type is sum, you must set embedding dim the same as encoder_out * 2
+  gst_embedding_dim: 1024
+  gst_reference_encoder_dim: 128
+  gst_num_heads: 8
+  gst_num_style_tokens: 10
+
+  # for TPSE-GST prediction path
+  gst_tpse_num_layers: 2
+  gst_tpse_gru_hidden_size: 256
+  bert_embedding_dim: 768
