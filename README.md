@@ -3,6 +3,14 @@
 PyTorch implementation of [Natural TTS Synthesis By Conditioning
 Wavenet On Mel Spectrogram Predictions](https://arxiv.org/pdf/1712.05884.pdf). 
 
+
+## Main improvements over Nvidia repo
+- Fre-GAN vocoder included, this is improved HifiGAN vocoder
+- Dynamic attention, Monotonic, Forced attentions. Basically mask loss using diagonal prior + dynamic programming. Works a lot better for fine-tuning on noisy / low data regimes.
+- Style features, such as GST (Tacotron-GST paper)
+- Ability to determine and add pauses for dataset, obtained from Montreal Forced Aligner tool
+- Pause predictor using TPSE
+
 ## Pre-requisites
 Tested on CUDA 11.3 with CUDNN and pytorch 1.8, python 3.8
 In this version of tacotron2 many new tweaks are added.
